@@ -1,0 +1,939 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>                    
+
+        <record id="support_ticket_close_lock" model="mail.template">
+            <field name="name">Support Ticket Close Lock</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Support Ticket Close Lock (#${object.ticket_number_display or object.id})</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                % if object.person_name :
+                    <p>Dear ${object.person_name},</p>
+                % endif
+                <p>The ticket has already been closed and locked, please open a new ticket or reply to an open ticket</p>
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b>
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned date : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+                    % if object.cmform :
+                        <li>CM Form : ${object.cmform}</li>
+                    % endif
+                </ul>
+
+                <b>SLA Duration and Timers:</b><br/>
+                <ul>
+                    % if object.sla_active == true :
+                        <li>SLA Active: Is Active</li>
+                    % endif
+                    % if object.sla_active == false:
+                        <li>SLA Active: Not Active</li>
+                    % endif
+                    % if object.sla_policies_id :
+                        <li>SLA : ${object.sla_policies_id.name}</li>
+                        <li>SLA Total Allocated Time (hours) : ${object.sla_time_solve} </li>
+                        <li>SLA Remaining Time (hours) : ${object.sla_timer} </li>
+
+                    % endif
+
+                </ul>
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+                    % if object.close_comment :
+                        <li>Close Comment : ${object.close_comment}</li>
+                    % endif
+                </ul>
+                ${object.description|safe}
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_merge" model="mail.template">
+            <field name="name">Support Ticket Merge</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket_merge"></field>
+            <field name="email_from"><![CDATA[${object.ticket_id.company_id.name} <${object.ticket_id.company_id.email}>]]></field>
+            <field name="email_to">${object.ticket_id.email|safe}</field>
+            <field name="subject">Support Ticket Merge (#${object.ticket_id.ticket_number_display or object.ticket_id.id})</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                % if object.ticket_id.person_name :
+                    <p>Dear ${object.ticket_id.person_name},</p>
+                % endif
+                <p>Your ticket has been merged with ticket number #${object.merge_ticket_id.ticket_number_display}</p>
+                <p>We are aware of this incident from a previously submitted request. You will be updated on any changes from the earlier ticket.</p>
+                <hr/>
+                ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_survey" model="mail.template">
+            <field name="name">Support Ticket Survey</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Support Ticket Survey (#${object.ticket_number_display or object.id})</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                % if object.person_name :
+                    <p>Dear ${object.person_name},</p>
+                % endif
+                <p>We would like to get your feedback on the support</p>
+                <p><a href="/supportzayd/survey/${object.portal_access_key}">here</a></p>
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b>
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned date : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+                    % if object.cmform :
+                        <li>CM Form : ${object.cmform}</li>
+                    % endif
+                    % if object.close_comment :
+                        <li>Close Comment : ${object.close_comment}</li>
+                    % endif
+                </ul>
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_sla_alert" model="mail.template">
+            <field name="name">Support Ticket SLA Alert</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="subject">SLA Alert</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear _user_name_,</p>
+                %if object.sla_timer > 0:
+                    <p>You have ${object.sla_timer_format} hours remaining for this ticket</p>
+                %endif
+                %if object.sla_timer < 0:
+                    <p>The SLA is currently ${object.sla_timer_format} hours overdue</p>
+                %endif
+               <p>Subject: ${object.subject}</p>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b>
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned to : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+
+                </ul>
+
+                <b>SLA Duration and Timers:</b><br/>
+                <ul>
+                    % if object.sla_active == true :
+                        <li>SLA Active: Is Active</li>
+                    % endif
+                    % if object.sla_active == false:
+                        <li>SLA Active: Not Active</li>
+                    % endif
+                    % if object.sla_policies_id :
+                        <li>SLA : ${object.sla_policies_id.name}</li>
+                        <li>SLA Total Allocated Time (hours) : ${object.sla_time_solve} </li>
+                        <li>SLA Remaining Time (hours) : ${object.sla_timer} </li>
+                    % endif
+
+                </ul>
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+            ]]>
+            </field>
+        </record>
+        
+        <record id="new_support_ticket_category" model="mail.template">
+            <field name="name">Support Ticket New Ticket (Category)</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="subject">New Support Ticket for your category</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear _user_name_,</p>
+                <p>A new support ticket has been created in a category that you follow</p>
+                <p>Person Name: ${object.person_name}</p>
+                <p>Subject: ${object.subject}</p>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b>
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned to : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+
+                </ul>
+
+                <b>SLA Duration and Timers:</b><br/>
+                <ul>
+                    % if object.sla_active == true :
+                        <li>SLA Active: Is Active</li>
+                    % endif
+                    % if object.sla_active == false:
+                        <li>SLA Active: Not Active</li>
+                    % endif
+                    % if object.sla_policies_id :
+                        <li>SLA : ${object.sla_policies_id.name}</li>
+                        <li>SLA Total Allocated Time (hours) : ${object.sla_time_solve} </li>
+                        <li>SLA Remaining Time (hours) : ${object.sla_timer} </li>
+                    % endif
+
+                </ul>
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+                <p>Click <a href="_ticket_url_">here</a> to view this support ticket online</p>
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_user_change" model="mail.template">
+            <field name="name">Support Ticket User Change</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <!--<field name="email_to">${object.user_id.login}</field>-->
+            <field name="subject">A Support Ticket has been assigned to you</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.user_id.login},</p>
+                <p>A support ticket been updated and has been assigned to you here are the details</p>
+                <hr/>
+                <p>Person Name: ${object.person_name}</p>
+                <p>Subject: ${object.subject}</p>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b>
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned to : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+                </ul>
+
+                <b>SLA Duration and Timers:</b><br/>
+                <ul>
+                    % if object.sla_active == true :
+                        <li>SLA Active: Is Active</li>
+                    % endif
+                    % if object.sla_active == false:
+                        <li>SLA Active: Not Active</li>
+                    % endif
+                    % if object.sla_policies_id :
+                        <li>SLA : ${object.sla_policies_id.name}</li>
+                        <li>SLA Total Allocated Time (hours) : ${object.sla_time_solve} </li>
+                        <li>SLA Remaining Time (hours) : ${object.sla_timer} </li>
+                    % endif
+
+                </ul>
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+                <b>View Ticket Online:</b> <a href="/supportzayd/portal/ticket/view/${object.portal_access_key}">here</a><br/>
+                
+            ]]>
+            </field>
+        </record>
+
+        <record id="new_support_ticket_category_change" model="mail.template">
+            <field name="name">Support Ticket Category Change</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>            
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Your support ticket has been updated</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.person_name},</p>
+                <p>Your support ticket has been updated and is now in the category '${object.category.name}' </p>
+                <hr/>
+                <p>Person Name: ${object.person_name}</p>
+                <p>Subject: ${object.subject}</p>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b>
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned to : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+                </ul>
+
+                <b>SLA Duration and Timers:</b><br/>
+                <ul>
+                    % if object.sla_active == true :
+                        <li>SLA Active: Is Active</li>
+                    % endif
+                    % if object.sla_active == false:
+                        <li>SLA Active: Not Active</li>
+                    % endif
+                    % if object.sla_policies_id :
+                        <li>SLA : ${object.sla_policies_id.name}</li>
+                        <li>SLA Total Allocated Time (hours) : ${object.sla_time_solve} </li>
+                        <li>SLA Remaining Time (hours) : ${object.sla_timer} </li>
+                    % endif
+
+                </ul>
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+                <p>Click <a href="_ticket_url_">here</a> to view this support ticket online</p>
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_close_wrapper" model="mail.template">
+            <field name="name">Support Ticket Close Wrapper</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket_close"></field>
+            <field name="email_from"><![CDATA[${object.ticket_id.company_id.name} <${object.ticket_id.company_id.email}>]]></field>
+            <field name="email_to">${object.ticket_id.email|safe}</field>
+            <field name="subject">Your support ticket has been closed</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html">
+                <![CDATA[
+                <p>Dear ${object.ticket_id.person_name},</p>
+                <p>Your support ticket has been closed by our staff</p>
+                % if object.close_comment:
+                    <p>Here is the final comment</p>
+                    <p>${object.close_comment|safe or ''}</p>
+                % endif
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b>
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned date : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+                    % if object.cmform :
+                        <li>CM Form : ${object.cmform}</li>
+                    % endif
+                </ul>
+
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+                    % if object.case_done :
+                        <li>Case Done : ${(datetime.datetime.strptime(object.case_done,'%Y-%m-%d %H:%M:%S') + relativedelta(hours=8)).strftime('%Y-%m-%d %H:%M:%S')} </li>
+                    % endif
+                    %if
+                </ul>
+                <b>Ticket Description:</b><br/>
+                ${object.ticket_id.description|safe}
+                
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_closed" model="mail.template">
+            <field name="name">Support Ticket Closed</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Your support ticket has been closed</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.person_name},</p>
+                <p>Your support ticket has been closed by our staff</p>
+                % if object.close_comment:
+                    <p>Here is the final comment</p>
+                    <p>${object.close_comment|safe or ''}</p>
+                % endif
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b>
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned date : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+                    % if object.cmform :
+                        <li>CM Form : ${object.cmform}</li>
+                    % endif
+                </ul>
+
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+                
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_new" model="mail.template">
+            <field name="name">Support Ticket New</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email|safe},${object.user_id.login}</field>
+            <field name="subject">We have received your support ticket '${object.subject}' and will get back to you shortly</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                % if object.person_name :
+                    <p>Dear ${object.person_name},</p>
+                % endif
+                <p>Thank you for submitting a support ticket to us, we will get back to your shortly</p>
+                <hr/>
+                <b>View Ticket Online:</b> <a href="/supportzayd/portal/ticket/view/${object.portal_access_key}">here</a><br/>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b> 
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned to : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+                </ul>
+
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+                
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_reply_wrapper" model="mail.template">
+            <field name="name">Support Ticket Reply Wrapper</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket_compose"></field>
+            <field name="subject">${object.subject}</field>
+            <field name="email_from">${user.email|safe}</field>            
+            <field name="email_to">${object.email|safe}</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                ${object.body|safe}
+                <hr/>
+                % if object.ticket_id.portal_access_key :
+                    <b>View Ticket Online:</b> <a href="/supportzayd/portal/ticket/view/${object.ticket_id.portal_access_key}">here</a><br/>
+                % endif
+                <b>Ticket Number:</b> ${object.ticket_id.ticket_number_display or object.ticket_id.id}<br/>
+                <b>Ticket Category:</b> ${object.ticket_id.category.name or ''}<br/>
+                <b>Ticket Subcategory:</b>
+                % if object.ticket_id.sub_category_id.name :
+                    ${object.ticket_id.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.ticket_id.problem:
+                        % for problems in object.ticket_id.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+
+                % if object.ticket_id.planned_time_format :
+                    <b>Planned Date:</b> ${object.ticket_id.planned_time_format}<br/>
+                % endif
+                <b>Ticket Description:</b><br/>
+                ${object.ticket_id.description|safe}
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_approval" model="mail.template">
+            <field name="name">Support Ticket Approval</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Support Ticket Approval (#${object.ticket_number_display or object.id})</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                % if object.person_name :
+                    <p>Dear ${object.person_name},</p>
+                    <br/>
+                % endif
+
+                <p>Approval is required before we can proceed with this support request, please click the link below to accept</p>
+                <br/>
+                <p><a href="${object.approve_url}" style="color:green">Approve</a> | <a href="${object.disapprove_url}" style="color:red">Don't Approve</a></p>
+
+            ]]>
+            </field>
+        </record>
+
+        <record id="support_ticket_approval_user" model="mail.template">
+            <field name="name">Support Ticket Approval (User)</field>
+            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Support Ticket Approval (#${object.ticket_number_display or object.id})</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear _user_name_,</p>
+                <p>A support ticket approval rating has changed</p>
+                <p>Person Name: ${object.person_name}</p>
+                <p>Subject: ${object.subject}</p>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b>
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned to : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+                </ul>
+
+                <b>SLA Duration and Timers:</b><br/>
+                <ul>
+                    % if object.sla_active == true :
+                        <li>SLA Active: Is Active</li>
+                    % endif
+                    % if object.sla_active == false:
+                        <li>SLA Active: Not Active</li>
+                    % endif
+                    % if object.sla_policies_id :
+                        <li>SLA : ${object.sla_policies_id.name}</li>
+                        <li>SLA Total Allocated Time (hours) : ${object.sla_time_solve} </li>
+                        <li>SLA Remaining Time (hours) : ${object.sla_timer} </li>
+                    % endif
+
+                </ul>
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+                <p>Click <a href="_ticket_url_">here</a> to view this support ticket online</p>
+            ]]>
+            </field>
+        </record>
+        
+</odoo>

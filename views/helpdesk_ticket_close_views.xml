@@ -1,0 +1,26 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>                    
+    
+      <record id="helpdesk_ticket_close_view_form" model="ir.ui.view">
+          <field name="name">helpdesk.ticket.close.form.view</field>
+          <field name="model">helpdesk.ticket.close</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="ticket_id" invisible="True"/>
+                      <field name="cm_form"/>
+                      <field name="case_done" autocomplete="off"/>
+                      <field name="message" widget="html"/>
+                      <field name="support_level_id" autocomplete="off"/>
+                      <field name="attachment_ids" widget="many2many_binary" string="Attach Files" nolabel="1" colspan="2"/>
+                      <field name="template_id" context="{'default_model':'helpdesk.ticket', 'default_body_html': message}"/>
+          	  </group>
+                  <footer>
+                        <button string="Close Ticket" name="close_ticket" type="object" class="btn-primary"/>
+                        <button string="Cancel" class="btn-default" special="cancel"/>
+                  </footer>
+      	      </form>
+      	  </field>
+      </record>
+
+</odoo>

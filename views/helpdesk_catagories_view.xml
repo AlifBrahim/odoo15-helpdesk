@@ -1,0 +1,45 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+      <record id="helpdesk_ticket_categories_view_form" model="ir.ui.view">
+          <field name="name">helpdesk.ticket.categories.form.view</field>
+          <field name="model">helpdesk.ticket.categories</field>
+          <field name="arch" type="xml">
+      	      <form>
+      	          <group>
+      	              <field name="name"/>
+      	          </group>
+      	      </form>
+      	  </field>
+      </record>
+
+      <record id="helpdesk_ticket_categories_view_tree" model="ir.ui.view">
+          <field name="name">helpdesk.ticket.categories.tree.view</field>
+          <field name="model">helpdesk.ticket.categories</field>
+          <field name="arch" type="xml">
+      	      <tree>
+                  <field name="sequence" widget="handle"/>
+      	          <field name="name"/>
+      	      </tree>
+      	  </field>
+      </record>
+
+      <record id="helpdesk_ticket_categories_action" model="ir.actions.act_window">
+          <field name="name">Support Ticket Categories</field>
+      	  <field name="res_model">helpdesk.ticket.categories</field>
+      	  <field name="view_mode">tree,form</field>
+      	  <field name="help" type="html">
+	      <p class="oe_view_nocontent_create">Create new category</p>
+	  </field>
+      </record>
+
+      <record id="sequence_supp_category_seq" model="ir.sequence">
+          <field name="name">helpdesk.ticket.categories sequence</field>
+          <field name="code">helpdesk.ticket.categories</field>
+          <field eval="1" name="number_next"/>
+          <field eval="1" name="number_increment"/>
+      </record>
+
+    </data>
+</odoo>
