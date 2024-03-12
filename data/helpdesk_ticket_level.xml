@@ -1,0 +1,16 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data noupdate="1">
+
+        <record id="support_level_first" model="helpdesk.ticket.level">
+            <field name="name">First Level Support</field>
+        </record>
+        <record id="support_level_second" model="helpdesk.ticket.level">
+            <field name="name">Second Level Support</field>
+        </record>
+        <record id="support_level_third" model="helpdesk.ticket.level">
+            <field name="name">Third Level Support</field>
+        </record>
+        
+    </data>     
+</odoo>

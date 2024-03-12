@@ -6,11 +6,14 @@ from dateutil.relativedelta import relativedelta
 from random import randint
 
 from odoo import api, Command, fields, models, tools, _
+from odoo.tools import DEFAULT_SERVER_DATETIME_FORMAT, DEFAULT_SERVER_DATE_FORMAT
 from odoo.addons.iap.tools import iap_tools
 from odoo.osv import expression
-from odoo.exceptions import AccessError
-import datetime
-from datetime import date, time, timedelta
+from odoo.exceptions import AccessError, ValidationError
+from datetime import datetime
+import re
+import logging
+_logger = logging.getLogger(__name__)
 
 TICKET_PRIORITY = [
     ('0', 'Low priority'),
@@ -295,8 +298,13 @@ class HelpdeskTicket(models.Model):
     open_case = fields.Datetime(string='Open Case Time', required=True)
     close_time = fields.Datetime(string="Close Time")
     prob_solve_time = fields.Datetime(string='Date of Completion')
+    closed_by_id = fields.Many2one('res.users', string="Closed By")
+    sla_active = fields.Boolean(string="SLA Active")
+
+
 
     # this is for ticket timeline information, technician check-in, check-out for tickets.
+    time_to_close = fields.Float(string="Time to close", help="seconds") #reeditted from format seconds to : @hafizalwi11jan
     time_to_close_hhmm = fields.Float(string="Time to close: ", help="hh:mm format")
     check_in = fields.Datetime('Technician Check-in', help="Time on which technician check-in for the job")
     check_out = fields.Datetime('Technician Check-out', help="Time on which technician check-out for the job")
@@ -925,6 +933,10 @@ class HelpdeskTicket(models.Model):
                     res -= subtype
         return res
     def open_close_ticket_wizard(self):
+        # Ensure 'self' is a valid record
+        if not self:
+            _logger.error("Attempted to open close ticket wizard on an invalid record.")
+            return {}
         return {
             'name': "Close Support Ticket",
             'type': 'ir.actions.act_window',
@@ -1012,7 +1024,7 @@ class HelpdeskTicketProblem(models.Model):
     @api.constrains('name', 'parent_subcategory_id', )
     def _check_duplicate(self):
         for record in self:
-            problem_tags = record.env['helpdesk.ticket.problem'].search_read(
+            problem_tags = self.env['helpdesk.ticket.problem'].search_read(
                 [('name', 'in', [record.name]), ('parent_subcategory_id', '=', record.parent_subcategory_id.id)])
             if len(problem_tags) > 1:
                 raise ValidationError(
@@ -1041,50 +1053,111 @@ class WebsiteSupportTicketClose(models.TransientModel):
     @api.onchange('template_id')
     def _onchange_template_id(self):
         if self.template_id:
-            values = \
-                self.env['mail.compose.message'].generate_email_for_composer(self.template_id.id, [self.ticket_id.id])[
-                    self.ticket_id.id]
-            self.message = values['body']
-
+            try:
+                values = \
+                    self.env['mail.compose.message'].generate_email_for_composer(self.template_id.id,
+                                                                                 [self.ticket_id.id])[
+                        self.ticket_id.id]
+                self.message = values['body']
+            except Exception as e:
+                _logger.error("Error generating email for composer: %s", e)
     def close_ticket(self): #@hafiz15dec
+        # Ensure 'self.ticket_id' is a valid record
+        if not self.ticket_id:
+            _logger.error("Attempted to close a ticket without a valid ticket_id.")
+            return
 
-        self.ticket_id.close_time = datetime.datetime.now()
+        self.ticket_id.close_time = datetime.now()
 
         # Also set the date for gamification
-        self.ticket_id.close_date = datetime.date.today()
+        self.ticket_id.close_date = datetime.today().date()
 
-        diff_time = datetime.datetime.strptime(self.ticket_id.close_time,
-                                               DEFAULT_SERVER_DATETIME_FORMAT) - datetime.datetime.strptime(
-            self.ticket_id.create_date, DEFAULT_SERVER_DATETIME_FORMAT)
+        # Directly subtract datetime objects to get the difference
+        diff_time = self.ticket_id.close_time - self.ticket_id.create_date
 
         diff_time_days = diff_time.days
         diff_time_seconds = diff_time.seconds
-        #diff_time_minutes = (diff_time_seconds % 3600) // 60
-        #diff_time_hours = diff_time_days * 24 + diff_time_seconds / 3600
-        diff_time_hours = diff_time_seconds / 3600 + (diff_time_days *24)
+        diff_time_hours = diff_time_seconds / 3600 + (diff_time_days * 24)
 
+        self.ticket_id.time_to_close_hhmm = float(str(diff_time_hours))
+        self.ticket_id.time_to_close = diff_time.total_seconds()
 
-        self.ticket_id.time_to_close_hhmm = (float(str(diff_time_hours)))
+        # Assign the ticket to the "Solved" stage
+        self.ticket_id.stage_id = self.env.ref('helpdesk.stage_solved')
 
-        self.ticket_id.time_to_close = diff_time.seconds
+        # Save the attachment_ids if any
+        if self.attachment_ids:
+            self.ticket_id.attachment_ids = [(6, 0, self.attachment_ids.ids)]
 
-        closed_state = self.env['ir.model.data'].sudo().get_object('website_supportzayd','website_ticket_state_staff_closed')
+        # result = self.env['ir.model.data'].sudo()._xmlid_lookup('helpdesk.website_ticket_state_staff_closed')
+        # print(result)
+        # xml_id = 'helpdesk.website_ticket_state_staff_closed'
+        # data_id = self.env['ir.model.data'].sudo().search([('name', '=', xml_id)], limit=1)
+        # if data_id:
+        #     print('XML ID exists and is associated with the record:', data_id.res_id)
+        # else:
+        #     print('XML ID does not exist or is not associated with any record')
 
-        # We record state change manually since it would spam the chatter if every 'Staff Replied' and 'Customer Replied' gets recorded
-        message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + self.ticket_id.state.name + " </span><b>-></b> " + closed_state.name + " </span></li></ul>"
-        self.ticket_id.message_post(body=message, subject="Ticket Closed by Staff")
+        # # # Assuming 'closed_state' is a tuple returned by _xmlid_lookup
+        # # # Correctly unpack the tuple to get the record ID and model name
+        # # record_id, model_name, additional_info = self.env['ir.model.data'].sudo()._xmlid_lookup(
+        # #     'helpdesk.website_ticket_state_staff_closed')
+        #  #
+        # # # Now, use the model name and record ID to browse the record
+        # # closed_state = self.env[model_name].browse(record_id)
+        #
+        # # Assuming 'helpdesk.website_ticket_state_staff_closed' is a reference to a record in the 'helpdesk.stage' model
+        # xml_id = 'helpdesk.website_ticket_state_staff_closed'
+        # record_id, record_model, record_noupdate = self.env['ir.model.data'].sudo()._xmlid_lookup(xml_id)
+        #
+        # self.env['helpdesk.stage'].invalidate_cache(['name'], [record_id])
+        # # Now, use the record ID to search the record
+        # # closed_state = self.env['helpdesk.stage'].search([('id', '=', record_id)], limit=1)
+        #
+        # # Now, use the record ID to browse the record
+        # closed_state = self.env['helpdesk.stage'].browse(record_id)
+        # print('closed_state: ',closed_state)
+        # print('record_id: ', record_id)
+        # # Flush the operations
+        # self.env['helpdesk.stage'].flush()
+        #
+        # closed_state.refresh()
+        # print('record_id after refresh: ', record_id)
+        # print('closed_stage_name: ', closed_state.name)
+        # # We record state change manually since it would spam the chatter if every 'Staff Replied' and 'Customer Replied' gets recorded
+        # closed_stage_name = "Unknown Stage"
+        # if closed_state:
+        #     ticket_stage_name = self.ticket_id.stage_id.read(['name'])[0]['name']
+        #     print('ticket_stage_name: ', ticket_stage_name)
+        #     if closed_state.name:
+        #         closed_stage_name = closed_state.name
+        #         print('closed_state: ', closed_state, 'closed_stage_name: ', closed_stage_name)
+        #     else:
+        #         print('closed_state Record does not exist')
+        #     message = "<ul class=\"o_mail_thread_message_tracking\">\n<li>State:<span> " + ticket_stage_name + " </span><b>-></b> " + closed_stage_name + " </span></li></ul>"
+        #     self.ticket_id.message_post(body=message, subject="Ticket Closed by Staff")
+        # else:
+        #     _logger.error("Failed to retrieve closed state record.")
 
-        email_wrapper = self.env['ir.model.data'].sudo().get_object('website_supportzayd', 'support_ticket_close_wrapper')# @hafizalwi17dec tested to put 'sudo()' so that data can be imported in mail template without having to give read permission to for certain fields such as 'problem' to group 'Technician', which is not good for security
-
-        values = email_wrapper.generate_email([self.id])[self.id]
-        values['model'] = "helpdesk.ticket"
-        values['res_id'] = self.ticket_id.id
-
-        for attachment in self.attachment_ids:
-            values['attachment_ids'].append((4, attachment.id))
-
-        send_mail = self.env['mail.mail'].create(values)
-        send_mail.send()
+        # values = {}
+        # xml_id = 'solved_ticket_request_email_template'
+        # record_id, record_model, record_noupdate = self.env['ir.model.data'].sudo()._xmlid_lookup(xml_id)
+        #
+        # # Now, use the record ID to browse the record
+        # if record_model == 'mail.template':
+        #     email_wrapper = self.env['mail.template'].browse(record_id)
+        #     fields = ['subject', 'body_html', 'email_from', 'email_to', 'partner_to', 'email_cc', 'reply_to']
+        #     values = email_wrapper.generate_email([self.id], fields)[self.id]
+        #     values['model'] = "helpdesk.ticket"
+        #     values['res_id'] = self.ticket_id.id
+        # else:
+        #     print('Record not found or incorrect model')
+        #
+        # for attachment in self.attachment_ids:
+        #     values['attachment_ids'].append((4, attachment.id))
+        #
+        # send_mail = self.env['mail.mail'].create(values)
+        # send_mail.send()
 
         cleanbreak = re.compile('<br\s*?>')
         cleanedbreak = re.sub(cleanbreak, '\n', self.message)
@@ -1094,14 +1167,14 @@ class WebsiteSupportTicketClose(models.TransientModel):
         self.ticket_id.cmform = self.cm_form
         self.ticket_id.prob_solve_time = self.case_done
         self.ticket_id.closed_by_id = self.env.user.id
-        self.ticket_id.state = closed_state.id
+        # self.ticket_id.stage = closed_state.id
 
         self.ticket_id.sla_active = False
 
-        # Auto send out survey
-        setting_auto_send_survey = self.env['ir.default'].get('helpdesk.settings', 'auto_send_survey')
-        if setting_auto_send_survey:
-            self.ticket_id.send_survey()
+        # # Auto send out survey
+        # setting_auto_send_survey = self.env['ir.default'].get('helpdesk.settings', 'auto_send_survey')
+        # if setting_auto_send_survey:
+        #     self.ticket_id.send_survey()
 
 class WebsiteSupportTicketMerge(models.TransientModel):
     _name = "helpdesk.ticket.merge"
@@ -1230,4 +1303,9 @@ class WebsiteSupportTicketCompose(models.Model):
             staff_replied = self.env['ir.model.data'].get_object('website_supportzayd',
                                                                  'website_ticket_state_staff_replied')
             self.ticket_id.state = staff_replied.id
+
+class WebsiteSupportTicketLevel(models.Model):
+    _name ="helpdesk.ticket.level"
+
+    name = fields.Char(string="Support Level") #this is to store model char ?? @hafizalwi1dec2021
 

@@ -1,0 +1,42 @@
+<?xml version="1.0" encoding="utf-8"?>
+<odoo>
+    <data>
+
+        <record id="helpdesk_ticket_level_view_form" model="ir.ui.view">
+        <field name="name">helpdesk.ticket.level.view.form</field>
+        <field name="model">helpdesk.ticket.level</field>
+        <field name="arch" type="xml">
+            <form string="level">
+                <sheet>
+                    <group>
+                  <field name="name"/>
+                    </group>
+                </sheet>
+            </form>
+        </field>
+    </record>
+
+      <record id="helpdesk_ticket_level_view_tree" model="ir.ui.view">
+          <field name="name">helpdesk.ticket.level.tree.view</field>
+          <field name="model">helpdesk.ticket.level</field>
+          <field name="arch" type="xml">
+              <tree editable="top">
+                  <field name="name"/>
+              </tree>
+          </field>
+      </record>
+
+      <record id="helpdesk_ticket_level_action" model="ir.actions.act_window">
+          <field name="name">Support Ticket Level of Support</field>
+          <field name="res_model">helpdesk.ticket.level</field>
+          <field name="view_mode">tree,form</field>
+          <field name="help" type="html">
+          <p>
+              No Support Tickets Level of Support
+          </p>
+          </field>
+      </record>
+
+
+    </data>
+</odoo>

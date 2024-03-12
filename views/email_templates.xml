@@ -636,159 +636,6 @@
             </field>
         </record>
 
-        <record id="support_ticket_closed" model="mail.template">
-            <field name="name">Support Ticket Closed</field>
-            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
-            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
-            <field name="email_to">${object.email|safe}</field>
-            <field name="subject">Your support ticket has been closed</field>
-            <field name="auto_delete" eval="False"/>
-            <field name="built_in" eval="True"/>
-            <field name="body_html"><![CDATA[
-                <p>Dear ${object.person_name},</p>
-                <p>Your support ticket has been closed by our staff</p>
-                % if object.close_comment:
-                    <p>Here is the final comment</p>
-                    <p>${object.close_comment|safe or ''}</p>
-                % endif
-                <hr/>
-                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
-                <b>Ticket Category:</b>
-                % if object.category.name :
-                    ${object.category.name}
-                % endif
-                <br/>
-                <b>Ticket Subcategory:</b>
-                % if object.sub_category_id.name :
-                    ${object.sub_category_id.name}
-                % endif
-                <br/>
-                <b>Ticket Problem: </b>
-                    % if object.problem:
-                        % for problems in object.problem:
-                            <li>   ${problems.name}</li>
-                        % endfor
-                    % endif
-                <br/>
-                <br/>
-                <b>More Details:</b><br/>
-                <ul>
-                    % if object.item.name :
-                        <li>Model : ${object.item.name}</li>
-                    % endif
-                    % if object.item.serial_no :
-                        <li>Serial Number : ${object.item.serial_no}</li>
-                    % endif
-                    % if object.person_name :
-                        <li>Client : ${object.person_name}</li>
-                    % endif
-                    % if object.contact_num :
-                        <li>Contact Number : ${object.contact_num}</li>
-                    % endif
-                    % if object.department :
-                        <li>Department : ${object.department}</li>
-                    % endif
-                    % if object.address :
-                        <li>Address : ${object.address}</li>
-                    % endif
-                    % if object.state :
-                        <li>Status : ${object.state.name}</li>
-                    % endif
-                    % if object.user_id :
-                        <li>Assigned to : ${object.user_id.name}</li>
-                    % endif
-                    % if object.assign_date :
-                        <li>Assigned date : ${object.assign_date}</li>
-                    % endif
-                    % if object.approval_id :
-                        <li>Approval : ${object.approval_id.name}</li>
-                    % endif
-                    % if object.cmform :
-                        <li>CM Form : ${object.cmform}</li>
-                    % endif
-                </ul>
-
-                <b>Ticket Description:</b><br/>
-                ${object.description|safe}
-                
-            ]]>
-            </field>
-        </record>
-
-        <record id="support_ticket_new" model="mail.template">
-            <field name="name">Support Ticket New</field>
-            <field name="model_id" ref="helpdesk.model_helpdesk_ticket"></field>
-            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
-            <field name="email_to">${object.email|safe},${object.user_id.login}</field>
-            <field name="subject">We have received your support ticket '${object.subject}' and will get back to you shortly</field>
-            <field name="auto_delete" eval="False"/>
-            <field name="built_in" eval="True"/>
-            <field name="body_html"><![CDATA[
-                % if object.person_name :
-                    <p>Dear ${object.person_name},</p>
-                % endif
-                <p>Thank you for submitting a support ticket to us, we will get back to your shortly</p>
-                <hr/>
-                <b>View Ticket Online:</b> <a href="/supportzayd/portal/ticket/view/${object.portal_access_key}">here</a><br/>
-                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
-                <b>Ticket Category:</b> 
-                % if object.category.name :
-                    ${object.category.name}
-                % endif
-                <br/>
-                <b>Ticket Subcategory:</b>
-                % if object.sub_category_id.name :
-                    ${object.sub_category_id.name}
-                % endif
-                <br/>
-                <b>Ticket Problem: </b>
-                    % if object.problem:
-                        % for problems in object.problem:
-                            <li>   ${problems.name}</li>
-                        % endfor
-                    % endif
-                <br/>
-                <b>More Details:</b><br/>
-                <ul>
-                    % if object.item.name :
-                        <li>Model : ${object.item.name}</li>
-                    % endif
-                    % if object.item.serial_no :
-                        <li>Serial Number : ${object.item.serial_no}</li>
-                    % endif
-                    % if object.person_name :
-                        <li>Client : ${object.person_name}</li>
-                    % endif
-                    % if object.contact_num :
-                        <li>Contact Number : ${object.contact_num}</li>
-                    % endif
-                    % if object.department :
-                        <li>Department : ${object.department}</li>
-                    % endif
-                    % if object.address :
-                        <li>Address : ${object.address}</li>
-                    % endif
-                    % if object.state :
-                        <li>Status : ${object.state.name}</li>
-                    % endif
-                    % if object.user_id :
-                        <li>Assigned to : ${object.user_id.name}</li>
-                    % endif
-                    % if object.assign_date :
-                        <li>Assigned to : ${object.assign_date}</li>
-                    % endif
-                    % if object.approval_id :
-                        <li>Approval : ${object.approval_id.name}</li>
-                    % endif
-                </ul>
-
-                <b>Ticket Description:</b><br/>
-                ${object.description|safe}
-                
-            ]]>
-            </field>
-        </record>
-
         <record id="support_ticket_reply_wrapper" model="mail.template">
             <field name="name">Support Ticket Reply Wrapper</field>
             <field name="model_id" ref="helpdesk.model_helpdesk_ticket_compose"></field>
@@ -932,6 +779,157 @@
                 <b>Ticket Description:</b><br/>
                 ${object.description|safe}
                 <p>Click <a href="_ticket_url_">here</a> to view this support ticket online</p>
+            ]]>
+            </field>
+        </record>
+     <record id="support_ticket_new" model="mail.template">
+            <field name="name">Support Ticket New</field>
+            <field name="model_id" ref="model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email|safe},${object.user_id.login}</field>
+            <field name="subject">We have received your support ticket '${object.subject}' and will get back to you shortly</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                % if object.person_name :
+                    <p>Dear ${object.person_name},</p>
+                % endif
+                <p>Thank you for submitting a support ticket to us, we will get back to your shortly</p>
+                <hr/>
+                <b>View Ticket Online:</b> <a href="/supportzayd/portal/ticket/view/${object.portal_access_key}">here</a><br/>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b>
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned to : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+                </ul>
+
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+
+            ]]>
+            </field>
+        </record>
+    <record id="support_ticket_closed" model="mail.template">
+            <field name="name">Support Ticket Closed</field>
+            <field name="model_id" ref="model_helpdesk_ticket"></field>
+            <field name="email_from"><![CDATA[${object.company_id.name} <${object.company_id.email}>]]></field>
+            <field name="email_to">${object.email|safe}</field>
+            <field name="subject">Your support ticket has been closed</field>
+            <field name="auto_delete" eval="False"/>
+            <field name="built_in" eval="True"/>
+            <field name="body_html"><![CDATA[
+                <p>Dear ${object.person_name},</p>
+                <p>Your support ticket has been closed by our staff</p>
+                % if object.close_comment:
+                    <p>Here is the final comment</p>
+                    <p>${object.close_comment|safe or ''}</p>
+                % endif
+                <hr/>
+                <b>Ticket Number:</b> ${object.ticket_number_display}<br/>
+                <b>Ticket Category:</b>
+                % if object.category.name :
+                    ${object.category.name}
+                % endif
+                <br/>
+                <b>Ticket Subcategory:</b>
+                % if object.sub_category_id.name :
+                    ${object.sub_category_id.name}
+                % endif
+                <br/>
+                <b>Ticket Problem: </b>
+                    % if object.problem:
+                        % for problems in object.problem:
+                            <li>   ${problems.name}</li>
+                        % endfor
+                    % endif
+                <br/>
+                <br/>
+                <b>More Details:</b><br/>
+                <ul>
+                    % if object.item.name :
+                        <li>Model : ${object.item.name}</li>
+                    % endif
+                    % if object.item.serial_no :
+                        <li>Serial Number : ${object.item.serial_no}</li>
+                    % endif
+                    % if object.person_name :
+                        <li>Client : ${object.person_name}</li>
+                    % endif
+                    % if object.contact_num :
+                        <li>Contact Number : ${object.contact_num}</li>
+                    % endif
+                    % if object.department :
+                        <li>Department : ${object.department}</li>
+                    % endif
+                    % if object.address :
+                        <li>Address : ${object.address}</li>
+                    % endif
+                    % if object.state :
+                        <li>Status : ${object.state.name}</li>
+                    % endif
+                    % if object.user_id :
+                        <li>Assigned to : ${object.user_id.name}</li>
+                    % endif
+                    % if object.assign_date :
+                        <li>Assigned date : ${object.assign_date}</li>
+                    % endif
+                    % if object.approval_id :
+                        <li>Approval : ${object.approval_id.name}</li>
+                    % endif
+                    % if object.cmform :
+                        <li>CM Form : ${object.cmform}</li>
+                    % endif
+                </ul>
+
+                <b>Ticket Description:</b><br/>
+                ${object.description|safe}
+
             ]]>
             </field>
         </record>

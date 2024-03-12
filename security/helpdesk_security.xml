@@ -136,6 +136,48 @@
         <field name="perm_create" eval="True"/>
         <field name="perm_unlink" eval="True"/>
     </record>
+         <!-- Access Rights for helpdesk.ticket.close -->
+    <record id="access_helpdesk_ticket_close" model="ir.model.access">
+        <field name="name">helpdesk.ticket.close access</field>
+        <field name="model_id" ref="model_helpdesk_ticket_close"/>
+        <field name="group_id" eval="[]"/> <!-- Applies to all users -->
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+           <!-- Access Rights for helpdesk.ticket.merge -->
+    <record id="access_helpdesk_ticket_merge" model="ir.model.access">
+        <field name="name">helpdesk.ticket.merge access</field>
+        <field name="model_id" ref="model_helpdesk_ticket_merge"/>
+        <field name="group_id" eval="[]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Access Rights for helpdesk.ticket.compose -->
+    <record id="access_helpdesk_ticket_compose" model="ir.model.access">
+        <field name="name">helpdesk.ticket.compose access</field>
+        <field name="model_id" ref="model_helpdesk_ticket_compose"/>
+        <field name="group_id" eval="[]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
+
+    <!-- Access Rights for helpdesk.ticket.level -->
+    <record id="access_helpdesk_ticket_level" model="ir.model.access">
+        <field name="name">helpdesk.ticket.level access</field>
+        <field name="model_id" ref="model_helpdesk_ticket_level"/>
+        <field name="group_id" eval="[]"/>
+        <field name="perm_read" eval="True"/>
+        <field name="perm_write" eval="True"/>
+        <field name="perm_create" eval="True"/>
+        <field name="perm_unlink" eval="True"/>
+    </record>
 
     </data>
 </odoo>

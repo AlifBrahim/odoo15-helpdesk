@@ -57,7 +57,7 @@
         <field name="user_id" ref="base.user_admin"/>
         <field name="priority">3</field>
         <field name="partner_id" ref="base.res_partner_12"/>
-        <field name="stage_id" ref="helpdesk.stage_in_progress"/>
+        <field name="stage_id" ref="helpdesk.stage_new"/>
         <field name="category" ref="helpdesk.helpdesk_tech_support"/>
     <field name="open_case" eval="(DateTime.now()).strftime('%Y-%m-%d %H:%M:%S')"/>
     </record>
@@ -103,7 +103,7 @@ Chester Reed
         <field name="user_id" ref="base.user_demo"/>
         <field name="ticket_type_id" ref="helpdesk.type_question"/>
         <field name="partner_id" ref="base.res_partner_4" />
-        <field name="stage_id" ref="helpdesk.stage_in_progress"/>
+        <field name="stage_id" ref="helpdesk.stage_new"/>
         <field name="description">
 Hello,
 
@@ -141,7 +141,7 @@ Thank you!
         <field name="user_id" ref="base.user_admin"/>
         <field name="ticket_type_id" ref="helpdesk.type_question"/>
         <field name="partner_id" ref="base.res_partner_3"/>
-        <field name="stage_id" ref="helpdesk.stage_in_progress"/>
+        <field name="stage_id" ref="helpdesk.stage_new"/>
         <field name="description">
 Hello,
 
@@ -160,7 +160,7 @@ Gemini Furniture
         <field name="team_id" ref="helpdesk.helpdesk_team1"/>
         <field name="ticket_type_id" ref="helpdesk.type_question"/>
         <field name="partner_id" ref="base.res_partner_2"/>
-        <field name="stage_id" ref="helpdesk.stage_cancelled"/>
+        <field name="stage_id" ref="helpdesk.stage_new"/>
         <field name="description">
 Hi,
 
@@ -217,7 +217,7 @@ Kind regards,
         <field name="ticket_type_id" ref="helpdesk.type_incident"/>
         <field name="user_id" ref="base.user_admin"/>
         <field name="partner_id" ref="base.res_partner_2"/>
-        <field name="stage_id" ref="helpdesk.stage_done"/>
+        <field name="stage_id" ref="helpdesk.stage_new"/>
         <field name="description">
 Hello,
 
@@ -236,7 +236,7 @@ Deco Addict
         <field name="ticket_type_id" ref="helpdesk.type_incident"/>
         <field name="user_id" ref="base.user_demo"/>
         <field name="partner_id" ref="base.res_partner_1"/>
-        <field name="stage_id" ref="helpdesk.stage_in_progress"/>
+        <field name="stage_id" ref="helpdesk.stage_new"/>
         <field name="description">
 Hello,
 
@@ -323,7 +323,7 @@ Ready Mat
         <field name="ticket_type_id" ref="helpdesk.type_incident"/>
         <field name="user_id" ref="base.user_admin"/>
         <field name="partner_id" ref="base.res_partner_12"/>
-        <field name="stage_id" ref="helpdesk.stage_in_progress"/>
+        <field name="stage_id" ref="helpdesk.stage_new"/>
         <field name="priority">3</field>
         <field name="tag_ids" eval="[(6,0,[ref('helpdesk.tag_repair'),ref('helpdesk.tag_service')])]"/>
         <field name="description">
@@ -346,7 +346,7 @@ Azure Interior
         <field name="ticket_type_id" ref="helpdesk.type_incident"/>
         <field name="user_id" ref="base.user_admin"/>
         <field name="partner_id" ref="base.res_partner_2"/>
-        <field name="stage_id" ref="helpdesk.stage_in_progress"/>
+        <field name="stage_id" ref="helpdesk.stage_new"/>
         <field name="description">
 Hi,
 
@@ -367,7 +367,7 @@ Deco
         <field name="ticket_type_id" ref="helpdesk.type_question"/>
         <field name="user_id" ref="base.user_demo"/>
         <field name="partner_id" ref="base.res_partner_3"/>
-        <field name="stage_id" ref="helpdesk.stage_in_progress"/>
+        <field name="stage_id" ref="helpdesk.stage_new"/>
         <field name="description">
 Hello,
 
@@ -388,7 +388,7 @@ Gemini Furniture
         <field name="ticket_type_id" ref="helpdesk.type_incident"/>
         <field name="user_id" ref="base.user_demo"/>
         <field name="partner_id" ref="base.res_partner_12"/>
-        <field name="stage_id" ref="helpdesk.stage_done"/>
+        <field name="stage_id" ref="helpdesk.stage_new"/>
         <field name="description">
 Hi,
 
@@ -406,7 +406,7 @@ Regards,
         <field name="ticket_type_id" ref="helpdesk.type_incident"/>
         <field name="user_id" ref="base.user_admin"/>
         <field name="partner_id" ref="base.res_partner_1"/>
-        <field name="stage_id" ref="helpdesk.stage_done"/>
+        <field name="stage_id" ref="helpdesk.stage_new"/>
         <field name="description">
 Hello,
 

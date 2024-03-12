@@ -630,10 +630,10 @@
         <field name="arch" type="xml">
             <form string="Helpdesk Ticket">
                 <header>
-                    <button type="object" name="open_close_ticket_wizard" string="Close Ticket"/> <!-- attrs="{'invisible' :[('close_time', '!=', False )]}" -->
+                    <button type="object" name="open_close_ticket_wizard" string="Close Ticket" attrs="{'invisible' :[('close_time', '!=', False )]}" />
                     <button name="assign_ticket_to_self" string="Assign To Me" type="object" class="oe_highlight" groups="helpdesk.group_helpdesk_user" attrs="{'invisible': [('user_id', '!=', False)]}" data-hotkey="q"/>
                     <field name="stage_id" widget="statusbar"
-                        options="{'clickable': '1', 'fold_field': 'fold'}"/>
+                        options="{'clickable': '1', 'fold_field': 'fold'}" invisible="1"/>
                 </header>
                 <sheet>
                     <field name="legend_blocked" invisible="1"/>

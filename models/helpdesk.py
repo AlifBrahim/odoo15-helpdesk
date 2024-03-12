@@ -620,6 +620,10 @@ class HelpdeskStage(models.Model):
         'Grey Kanban Label', default=lambda s: _('In Progress'), translate=True, required=True,
         help='Override the default value displayed for the normal state for kanban selection, when the task or issue is in that stage.')
     ticket_count = fields.Integer(compute='_compute_ticket_count')
+    mail_template_id = fields.Many2one('mail.template', domain="[('model_id','=','helpdesk.ticket')]",
+                                       string="Mail Template",
+                                       help="The mail message that the customer gets when the state changes")
+    unattended = fields.Boolean(string="Unattended", help="If ticked, tickets in this state will appear by default")
 
     def _compute_ticket_count(self):
         res = self.env['helpdesk.ticket'].read_group(

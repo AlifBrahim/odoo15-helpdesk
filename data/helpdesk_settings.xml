@@ -1,0 +1,34 @@
+<!--<?xml version="1.0" encoding="utf-8"?>-->
+<!--<odoo>-->
+<!--    <data noupdate="1">-->
+
+<!--        <function id="default_ticket_merge_email_template_id"-->
+<!--            model="ir.default" name="set"-->
+<!--            eval="('helpdesk.settings', 'ticket_merge_email_template_id', ref('helpdesk.support_ticket_merge') )"/>-->
+
+<!--        <function id="default_ticket_lock_email_template_id"-->
+<!--            model="ir.default" name="set"-->
+<!--            eval="('helpdesk.settings', 'ticket_lock_email_template_id', ref('helpdesk.support_ticket_close_lock') )"/>-->
+
+<!--        <function id="default_change_user_email_template_id"-->
+<!--            model="ir.default" name="set"-->
+<!--            eval="('helpdesk.settings', 'change_user_email_template_id', ref('helpdesk.support_ticket_user_change') )"/>-->
+<!--    -->
+<!--        <function id="default_close_ticket_email_template_id"-->
+<!--            model="ir.default" name="set"-->
+<!--            eval="('helpdesk.settings', 'close_ticket_email_template_id', ref('helpdesk.support_ticket_closed') )"/>-->
+
+<!--        <function id="default_staff_reply_email_template_id"-->
+<!--            model="ir.default" name="set"-->
+<!--            eval="('helpdesk.settings', 'staff_reply_email_template_id', ref('helpdesk.support_ticket_reply_wrapper') )"/>-->
+
+<!--        <function id="default_max_ticket_attachments"-->
+<!--            model="ir.default" name="set"-->
+<!--            eval="('helpdesk.settings', 'max_ticket_attachments', 2 )"/>-->
+
+<!--        <function id="default_max_ticket_attachment_filesize"-->
+<!--            model="ir.default" name="set"-->
+<!--            eval="('helpdesk.settings', 'max_ticket_attachment_filesize', 500 )"/>-->
+
+<!--    </data>     -->
+<!--</odoo>-->
