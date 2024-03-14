@@ -317,6 +317,8 @@ class HelpdeskTicket(models.Model):
                                  help="Floating Precision is set to 15 (maximum for longitude and latitude)")
     check_out_long = fields.Float(string="Check-out longitude", digits=(12, 15),
                                   help="Floating Precision is set to 15 (maximum for longitude and latitude)")
+    address = fields.Char(string='Address')
+    department = fields.Char(string='Department')
 
     @api.constrains('project_id')
     def _check_project(self):
