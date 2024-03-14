@@ -241,10 +241,9 @@ class HelpdeskTicket(models.Model):
     legend_done = fields.Char(related='stage_id.legend_done', string='Kanban Valid Explanation', readonly=True, related_sudo=False)
     legend_normal = fields.Char(related='stage_id.legend_normal', string='Kanban Ongoing Explanation', readonly=True, related_sudo=False)
     domain_user_ids = fields.Many2many('res.users', compute='_compute_domain_user_ids')
-    user_id = fields.Many2one(
-        'res.users', string='Assigned to', compute='_compute_user_and_stage_ids', store=True,
-        readonly=False, tracking=True,
-        domain=lambda self: [('groups_id', 'in', self.env.ref('helpdesk.group_helpdesk_user').id)])
+    user_id = fields.Many2one('res.users', string='Assigned to') # , compute='_compute_user_and_stage_ids',
+    # store=True, readonly=False, tracking=True,  domain=lambda self: [('groups_id', 'in', self.env.ref(
+    # 'helpdesk.group_helpdesk_user').id)]
     partner_id = fields.Many2one('res.partner', string='Customer')
     partner_ticket_ids = fields.Many2many('helpdesk.ticket', compute='_compute_partner_ticket_count', string="Partner Tickets")
     partner_ticket_count = fields.Integer('Number of other tickets from the same partner', compute='_compute_partner_ticket_count')
@@ -1035,7 +1034,7 @@ class HelpdeskTicketProblem(models.Model):
         sequence = self.env['ir.sequence'].next_by_code('helpdesk.ticket.problem')
         values['sequence'] = sequence
         return super(HelpdeskTicketProblem, self).create(values)
-    
+
 class WebsiteSupportTicketClose(models.TransientModel):
     _name = "helpdesk.ticket.close"
 

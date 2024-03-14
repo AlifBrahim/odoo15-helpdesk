@@ -503,7 +503,7 @@
                 <field name="display_name" string="Name" readonly="1"/>
                 <field name="team_id" optional="show" readonly="1" invisible="context.get('default_team_id', False)"/>
                 <field name="team_id" optional="hide" readonly="1" invisible="not context.get('default_team_id', False)"/>
-                <field name="user_id" optional="show" widget="many2one_avatar_user" options="{'no_quick_create': True}"/>
+                <field name="user_id" optional="show" options="{'no_quick_create': True}"/> <!-- widget="many2one_avatar_user" -->
                 <field name="partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" widget="res_partner_many2one" optional="show"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide" readonly="1" invisible="context.get('default_team_id', False)"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide" readonly="1" invisible="not context.get('default_team_id', False)"/>
@@ -667,7 +667,7 @@
                             <field name="category" required="1"/>
                             <field name="sub_category_id" required="1"/>
                             <field name="problem" required="1"/>
-                            <field name="user_id" class="field_user_id" domain="['&amp;', ('id', 'in', domain_user_ids), ('share', '=', False)]" widget="many2one_avatar_user"/>
+                            <field name="user_id"/> <!-- class="field_user_id" domain="['&amp;', ('id', 'in', domain_user_ids), ('share', '=', False)]" widget="many2one_avatar_user" -->
                             <field name="domain_user_ids" invisible="1"/>
                             <field name="assign_date"/>
                             <field name="ticket_type_id"/>
