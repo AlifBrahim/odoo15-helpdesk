@@ -629,6 +629,7 @@
         <field name="model">helpdesk.ticket</field>
         <field name="arch" type="xml">
             <form string="Helpdesk Ticket">
+                <field name="is_saved" invisible="1"/>
                 <header>
                     <button type="object" name="open_close_ticket_wizard" string="Close Ticket" attrs="{'invisible' :[('close_time', '!=', False )]}" />
                     <button name="assign_ticket_to_self" string="Assign To Me" type="object" class="oe_highlight" groups="helpdesk.group_helpdesk_user" attrs="{'invisible': [('user_id', '!=', False)]}" data-hotkey="q"/>
@@ -653,10 +654,12 @@
                     </div>
                     <group>
                         <group>
-                            <field name="partner_id" class="field_partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" widget="res_partner_many2one" context="{'default_name': partner_name, 'default_email': partner_email, 'default_phone': partner_phone}"/>
-                            <field name="project_id"/>
-                            <field name="inventory_serial_number_id"/>
-                            <field name="partner_name" attrs="{'invisible': [('partner_id', '!=', False)]}"/>
+                            <field name="inventory_serial_number_id" attrs="{'readonly': [('is_saved', '=', True)]}" />
+                            <field name="person_name"/>
+                            <field name="equipment_user" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,}" attrs="{'readonly': [('is_saved', '=', True)]}" />
+                            <field name="partner_id" class="field_partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" widget="res_partner_many2one" /> <!-- context="{'default_name': equipment_user, 'default_email': partner_email, 'default_phone': partner_phone}" -->
+                            <field name="project_id" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,}" />
+                            <field name="partner_name" invisible="1" attrs="{'invisible': [('partner_id', '!=', False)]}"/>
                             <field name="partner_email" widget="email" string="Email"/>
                             <field name="partner_phone" widget="phone" string="Phone"/>
                             <field name="email_cc" invisible="1" groups="base.group_no_one"/>
@@ -667,8 +670,8 @@
                             <field name="active" invisible="1"/>
                             <field name="team_id" invisible="1" required="1"/>
                             <field name="category" required="1"/>
-                            <field name="sub_category_id" required="1"/>
-                            <field name="problem" required="1"/>
+                            <field name="sub_category_id" required="1" domain="[('parent_category_id','=',category)]" context="{'default_parent_category_id': category}"/>
+                            <field name="problem" required="1" domain="[('parent_subcategory_id','=',sub_category_id)]" context="{'default_parent_subcategory_id': sub_category_id}" widget="many2many_tags"/>
                             <field name="user_id"/> <!-- class="field_user_id" domain="['&amp;', ('id', 'in', domain_user_ids), ('share', '=', False)]" widget="many2one_avatar_user" -->
                             <field name="domain_user_ids" invisible="1"/>
                             <field name="assign_date"/>
@@ -725,7 +728,7 @@
                             <page string="Close Activity"> <!-- attrs="{'invisible': [('compute_field', '=', True)]}" -->
                                 <group>
                                     <field name="cmform"/>
-                                    <field name="close_comment" />
+                                    <field name="close_comment" attrs="{'readonly': [('is_saved', '=', True)]}" />
                                 </group>
                             </page>
 <!--                            <page string="Support Rating &#38; Comments "> &lt;!&ndash; attrs="{'invisible': [('compute_field', '=', True)]}" &ndash;&gt;-->
