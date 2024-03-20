@@ -671,7 +671,7 @@
                             <field name="team_id" invisible="1" required="1"/>
                             <field name="category" required="1"/>
                             <field name="sub_category_id" required="1" domain="[('parent_category_id','=',category)]" context="{'default_parent_category_id': category}"/>
-                            <field name="problem" required="1" domain="[('parent_subcategory_id','=',sub_category_id)]" context="{'default_parent_subcategory_id': sub_category_id}" widget="many2many_tags"/>
+                            <field name="problem" required="1" domain="[('parent_subcategory_id','=',sub_category_id)]" context="{'default_parent_subcategory_id': sub_category_id}"/>
                             <field name="user_id"/> <!-- class="field_user_id" domain="['&amp;', ('id', 'in', domain_user_ids), ('share', '=', False)]" widget="many2one_avatar_user" -->
                             <field name="domain_user_ids" invisible="1"/>
                             <field name="assign_date"/>
