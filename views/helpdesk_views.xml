@@ -587,11 +587,17 @@
                                     <field name="commercial_partner_id"/>
                                 </div>
                                 <div>
-                                    <field name="ticket_type_id"/>
+                                    <field name="sub_category_id"/> - <field name="problem"/>
                                 </div>
                                 <div>
-                                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>
+                                    <span class="badge badge-primary" t-esc="record.stage_id.value"/>
                                 </div>
+<!--                                <div>-->
+<!--                                    <field name="ticket_type_id"/>-->
+<!--                                </div>-->
+<!--                                <div>-->
+<!--                                    <field name="tag_ids" widget="many2many_tags" options="{'color_field': 'color'}"/>-->
+<!--                                </div>-->
                                 <field name="use_sla" invisible="1"/>
                                 <div t-if="record.sla_deadline.raw_value &amp;&amp; record.use_sla.raw_value">
                                     <t t-if="new Date(record.sla_deadline.raw_value) &lt; (new Date())" t-set="red" t-value="'oe_kanban_text_red'"/>
