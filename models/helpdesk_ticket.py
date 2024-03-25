@@ -1124,6 +1124,7 @@ class HelpdeskTicketCategories(models.Model):
 
     sequence = fields.Integer(string="Sequence")
     name = fields.Char(required=True, translate=True, string='Category Name')
+    color = fields.Integer('Color Index', default=1)
 
     # commented out to solve creating user by admin issues@hafizalwi2Dec
     @api.model
@@ -1141,6 +1142,19 @@ class HelpdeskTicketCategories(models.Model):
         sequence = self.env['ir.sequence'].next_by_code('helpdesk.ticket.categories')
         values['sequence'] = sequence
         return super(HelpdeskTicketCategories, self).create(values)
+
+    def action_view_ticket(self):
+        action = self.env["ir.actions.actions"]._for_xml_id("helpdesk.helpdesk_ticket_action_team")
+        action['display_name'] = self.name
+        return action
+
+    def action_view_open_ticket_view(self):
+        action = self.action_view_ticket()
+        action.update({
+            'display_name': _("Tickets"),
+            'domain': [('team_id', '=', self.id), ('stage_id.is_close', '=', False)],
+        })
+        return action
 
 
 class HelpdeskTicketSubCategories(models.Model):
