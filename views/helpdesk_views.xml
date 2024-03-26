@@ -451,6 +451,7 @@
                         ]"/>
                 <group expand="0" string="Group By">
                     <filter string="Assigned to" name="assignee" context="{'group_by':'user_id'}"/>
+                    <filter string="Problem" name="problem" context="{'group_by': 'problem'}"/>
                     <filter string="Team" name="team" context="{'group_by':'team_id'}" invisible="context.get('default_team_id', False)"/>
                     <filter string="Stage" name="stage" context="{'group_by':'stage_id'}"/>
                     <filter string="Type" name="ticket_type_id" context="{'group_by':'ticket_type_id'}"/>
@@ -496,25 +497,31 @@
         <field name="model">helpdesk.ticket</field>
         <field name="arch" type="xml">
             <tree string="Tickets" multi_edit="1" sample="1">
+                <field name="create_date"/>
+                <field name="ticket_number_display"/>
+                <field name="equipment_user"/>
+                <field name="partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" widget="res_partner_many2one" optional="show"/>
+                <field name="category"/>
+                <field name="sub_category_id"/>
+                <field name="stage_id" optional="show" readonly="not context.get('default_team_id', False)"/>
+                <field name="sla_deadline" attrs="{'invisible': [('use_sla', '=', False)]}" optional="show" widget="remaining_days"/>
+                <!-- Below are invisible fields -->
+                <field name="team_id" optional="hide" readonly="1" invisible="context.get('default_team_id', False)"/>
+                <field name="team_id" optional="hide" readonly="1" invisible="not context.get('default_team_id', False)"/>
                 <field name="use_sla" invisible="1"/>
                 <field name="legend_normal" invisible="1"/>
                 <field name="legend_blocked" invisible="1"/>
                 <field name="legend_done" invisible="1"/>
-                <field name="display_name" string="Name" readonly="1"/>
-                <field name="team_id" optional="show" readonly="1" invisible="context.get('default_team_id', False)"/>
-                <field name="team_id" optional="hide" readonly="1" invisible="not context.get('default_team_id', False)"/>
-                <field name="user_id" optional="show" options="{'no_quick_create': True}"/> <!-- widget="many2one_avatar_user" -->
-                <field name="partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" widget="res_partner_many2one" optional="show"/>
+                <field name="display_name" string="Name" readonly="1" invisible="1"/>
+                <field name="user_id" invisible="1" optional="show" options="{'no_quick_create': True}"/> <!-- widget="many2one_avatar_user" -->
                 <field name="company_id" groups="base.group_multi_company" optional="hide" readonly="1" invisible="context.get('default_team_id', False)"/>
                 <field name="company_id" groups="base.group_multi_company" optional="hide" readonly="1" invisible="not context.get('default_team_id', False)"/>
-                <field name="activity_ids" widget="list_activity" optional="show"/>
-                <field name="priority" optional="show" widget="priority"/>
+                <field name="activity_ids" widget="list_activity" optional="hide"/>
+                <field name="priority" optional="hide" widget="priority"/>
                 <field name="sla_status_ids" widget="many2many_tags" attrs="{'invisible': [('use_sla', '=', False)]}" options="{'color_field': 'color'}" string="SLAs" optional="hide" readonly="1"/>
-                <field name="sla_deadline" attrs="{'invisible': [('use_sla', '=', False)]}" optional="show" widget="remaining_days"/>
                 <field name="ticket_type_id" options="{'no_create_edit': True}" optional="hide"/>
                 <field name="tag_ids" optional="hide" widget="many2many_tags" options="{'color_field': 'color'}"/>
                 <field name="kanban_state" optional="hide" readonly="1" widget="state_selection"/>
-                <field name="stage_id" optional="show" readonly="not context.get('default_team_id', False)"/>
             </tree>
         </field>
     </record>
@@ -546,7 +553,7 @@
         <field name="model">helpdesk.ticket</field>
         <field name="priority">10</field>
         <field name="arch" type="xml">
-            <kanban default_group_by="stage_id" class="o_kanban_small_column o_kanban_helpdesk_ticket" quick_create_view="helpdesk.quick_create_ticket_form" sample="1">
+            <kanban default_group_by="category" class="o_kanban_small_column o_kanban_helpdesk_ticket" quick_create_view="helpdesk.quick_create_ticket_form" sample="1">
                 <field name="stage_id" options='{"group_by_tooltip": {"description": "Stage Description"}}'/>
                 <field name="user_id"/>
                 <field name="color"/>
@@ -581,7 +588,7 @@
                             </div>
                             <div class="oe_kanban_content">
                                 <div>
-                                    <strong><field name="name"/> (#<field name="id"/>)</strong>
+                                    <strong>#<field name="ticket_number_display"/> <field name="sub_category_id"/></strong>
                                 </div>
                                 <div>
                                     <field name="commercial_partner_id"/>
@@ -655,12 +662,13 @@
                     <field name="kanban_state" widget="state_selection"/>
                     <field name="use_sla" invisible="1"/>
                     <div class="oe_title">
-                        <h1><field name="name" class="field_name" placeholder="Subject..."/></h1>
+<!--                        <h1><field name="name" invisible="1" class="field_name" placeholder="Subject..."/></h1>-->
+                        <h1><field name="inventory_serial_number_id" attrs="{'readonly': [('is_saved', '=', True)]}" class="field_name" placeholder="Serial Number"/></h1>
                         <field name="sla_status_ids" widget="many2many_tags" attrs="{'invisible': [('use_sla', '=', False)]}" options="{'color_field': 'color', 'no_edit_color': True}" readonly="1" groups="helpdesk.group_use_sla"/>
                     </div>
                     <group>
                         <group>
-                            <field name="inventory_serial_number_id" attrs="{'readonly': [('is_saved', '=', True)]}" />
+<!--                            <field name="inventory_serial_number_id" attrs="{'readonly': [('is_saved', '=', True)]}" />-->
                             <field name="person_name"/>
                             <field name="equipment_user" options="{'no_quick_create':True,'no_create_edit':True,'no_open': True,}" attrs="{'readonly': [('is_saved', '=', True)]}" />
                             <field name="partner_id" class="field_partner_id" domain="['|', ('company_id', '=', False), ('company_id', '=', company_id)]" widget="res_partner_many2one" /> <!-- context="{'default_name': equipment_user, 'default_email': partner_email, 'default_phone': partner_phone}" -->

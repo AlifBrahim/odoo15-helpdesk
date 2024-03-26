@@ -36,7 +36,7 @@
     <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
     <field name="email_from">{{ (object.user_id.email_formatted or user.email_formatted) }}</field>
     <field name="email_to">{{ (object.partner_email if not object.sudo().partner_id.email or object.sudo().partner_id.email != object.partner_email else '') + (', ' + object.user_id.email if object.user_id.email else '') }}</field>
-    <field name="subject">We have received your support ticket {{ object.display_name }} and will get back to you shortly</field>
+    <field name="subject">We have received your support ticket {{ object.ticket_number_display }} and will get back to you shortly</field>
     <field name="auto_delete" eval="False"/>
     <field name="body_html" type="html">
          <div>
@@ -107,7 +107,7 @@
     <record id="solved_ticket_request_email_template" model="mail.template">
         <field name="name">Ticket: Solved</field>
         <field name="model_id" ref="helpdesk.model_helpdesk_ticket"/>
-        <field name="subject">Your support ticket {{ object.display_name }} has been closed</field>
+        <field name="subject">Your support ticket {{ object.ticket_number_display }} has been closed</field>
         <field name="email_from">{{ (object.user_id.email_formatted or user.email_formatted) }}</field>
         <field name="email_to">{{ (object.partner_email if not object.sudo().partner_id.email or object.sudo().partner_id.email != object.partner_email else '') + (', ' + object.user_id.email if object.user_id.email else '') }}</field>
         <field name="partner_to">{{ object.partner_id.id if object.sudo().partner_id.email and object.sudo().partner_id.email == object.partner_email else '' }}</field>

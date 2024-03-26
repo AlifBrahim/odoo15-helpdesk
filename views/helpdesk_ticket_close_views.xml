@@ -12,8 +12,8 @@
                       <field name="case_done" autocomplete="off"/>
                       <field name="message" widget="html"/>
                       <field name="support_level_id" autocomplete="off"/>
-                      <field name="attachment_ids" widget="many2many_binary" string="Attach Files" nolabel="1" colspan="2"/>
-                      <field name="template_id" context="{'default_model':'helpdesk.ticket', 'default_body_html': message}"/>
+<!--                      <field name="attachment_ids" widget="many2many_binary" string="Attach Files" nolabel="1" colspan="2"/>-->
+<!--                      <field name="template_id" context="{'default_model':'helpdesk.ticket', 'default_body_html': message}"/>-->
           	  </group>
                   <footer>
                         <button string="Close Ticket" name="close_ticket" type="object" class="btn-primary"/>

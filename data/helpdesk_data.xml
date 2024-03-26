@@ -11,7 +11,7 @@
 
     <!-- stage "New" gets created by default with sequence 0-->
     <record id="stage_new" model="helpdesk.stage">
-        <field name="name">New</field>
+        <field name="name">Open</field>
         <field name="sequence">0</field>
         <field name="team_ids" eval="[(4, ref('helpdesk_team1'))]"/>
         <field name="is_close" eval="False"/>
@@ -24,7 +24,7 @@
         <field name="is_close" eval="False"/>
     </record>
     <record id="stage_solved" model="helpdesk.stage">
-        <field name="name">Solved</field>
+        <field name="name">Staff Closed</field>
         <field name="team_ids" eval="[(4, ref('helpdesk_team1'))]"/>
         <field name="sequence">2</field>
         <field name="is_close" eval="True"/>
@@ -36,6 +36,13 @@
         <field name="sequence">3</field>
         <field name="team_ids" eval="[(4, ref('helpdesk_team1'))]"/>
         <field name="is_close" eval="True"/>
+        <field name="fold" eval="True"/>
+    </record>
+    <record id="stage_technician_closed" model="helpdesk.stage">
+        <field name="name">Technician Closed</field>
+        <field name="sequence">4</field>
+        <field name="team_ids" eval="[(4, ref('helpdesk_team1'))]"/>
+        <field name="is_close" eval="False"/>
         <field name="fold" eval="True"/>
     </record>
 

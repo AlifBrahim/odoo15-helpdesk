@@ -4,6 +4,7 @@
 {
     'name': 'Helpdesk',
     'version': '1.4',
+    'author': "Sigma Rectrix, Alif Ibrahim, Irfan Asyraf, Zulfa Iza",
     'category': 'Services/Helpdesk',
     'sequence': 110,
     'summary': 'Track, prioritize, and solve customer tickets',

@@ -1,5 +1,9 @@
 # -*- coding: utf-8 -*-
 # Part of Odoo. See LICENSE file for full copyright and licensing details.
+import requests
+import json
+# REMEMBER TO INSTALL oauth2client before restarting Odoo by command (pip install oauth2client)
+from oauth2client.service_account import ServiceAccountCredentials
 
 import math
 from dateutil.relativedelta import relativedelta
@@ -203,7 +207,7 @@ class HelpdeskSLAStatus(models.Model):
 class HelpdeskTicket(models.Model):
     _name = 'helpdesk.ticket'
     _description = 'Helpdesk Ticket'
-    _order = 'priority desc, id desc'
+    _order = "create_date desc"
     _inherit = ['portal.mixin', 'mail.thread.cc', 'utm.mixin', 'rating.mixin', 'mail.activity.mixin']
 
     @api.model
@@ -234,7 +238,7 @@ class HelpdeskTicket(models.Model):
 
         return stages.search(search_domain, order=order)
 
-    name = fields.Char(string='Subject', required=True, index=True)
+    name = fields.Char(string='Subject', index=True)  # , required=True
     team_id = fields.Many2one('helpdesk.team', string='Helpdesk Team', default=_default_team_id, index=True)
     use_sla = fields.Boolean(related='team_id.use_sla')
     description = fields.Html()
@@ -347,6 +351,15 @@ class HelpdeskTicket(models.Model):
     equipment_user = fields.Many2one('res.partner', string='Equipment User')
     person_name = fields.Char(string='Reported By')
     is_saved = fields.Boolean(compute='_compute_is_saved')
+    ticket_number = fields.Integer(string="Ticket Number", readonly=True, default="5197")
+    ticket_number_display = fields.Char(string="Ticket Number Display", compute="_compute_ticket_number_display",
+                                        store=True)
+
+    @api.depends('ticket_number')
+    def _compute_ticket_number_display(self):
+        for record in self:
+            record.ticket_number_display = str("TN") + str(record.id) + "-" + datetime.today().strftime(
+                '%Y%m%d') + "-" + "{:,}".format(record.id)
 
     @api.depends('create_date')
     def _compute_is_saved(self):
@@ -674,7 +687,7 @@ class HelpdeskTicket(models.Model):
     def name_get(self):
         result = []
         for ticket in self:
-            result.append((ticket.id, "%s (#%d)" % (ticket.name, ticket._origin.id)))
+            result.append((ticket.id, "%s (#%d)" % (ticket.ticket_number_display, ticket._origin.id)))
         return result
 
     @api.model
@@ -704,6 +717,8 @@ class HelpdeskTicket(models.Model):
         # to avoid intrusive changes in the 'mail' module
         # TDE TODO: to extract and clean in mail thread
         for vals in list_value:
+            # Get next ticket number from the sequence
+            vals['ticket_number'] = self.env['ir.sequence'].next_by_code('helpdesk.ticket')
             partner_id = vals.get('partner_id', False)
             partner_name = vals.get('partner_name', False)
             partner_email = vals.get('partner_email', False)
@@ -752,6 +767,49 @@ class HelpdeskTicket(models.Model):
 
             if vals.get('stage_id'):
                 vals['date_last_stage_update'] = now
+            ticket = super(HelpdeskTicket, self).create(vals)
+            # Send FCM notification
+            if ticket.user_id.fcm_token_id:
+                # Retrieve all tokens for the user
+                fcm_tokens = self.env['fcm.token'].search([('user_id', '=', ticket.user_id.id)])
+                for token in fcm_tokens:
+                    print('Sending notification to FCM token:', token.token)
+
+                    # Load the service account key JSON file.
+                    creds = ServiceAccountCredentials.from_json_keyfile_name(
+                        r'C:\Users\DELL\odoo15\addons\helpdesk\sigma-helpdesk-firebase-adminsdk-3ayru-601327b0dd.json',
+                        ['https://www.googleapis.com/auth/firebase.messaging']
+                    )
+
+                    # Obtain an access token.
+                    access_token_info = creds.get_access_token()
+                    access_token = access_token_info.access_token
+
+                    print('Access token obtained:', access_token)
+
+                    url = 'https://fcm.googleapis.com/v1/projects/sigma-helpdesk/messages:send'
+                    headers = {
+                        'Content-Type': 'application/json',
+                        'Authorization': 'Bearer ' + access_token,
+                    }
+                    data = {
+                        'message': {
+                            'token': token.token,
+                            'notification': {
+                                'title': 'New Ticket: ' + str(ticket.ticket_number),
+                                'body': 'A new ticket has been assigned to you.',
+                            },
+                        },
+                    }
+                    try:
+                        response = requests.post(url, headers=headers, data=json.dumps(data))
+                        if response.status_code == 200:
+                            print('Notification sent successfully to:', token.token)
+                        else:
+                            print('Notification not sent. Response:', response.content)
+                    except Exception as e:
+                        print('Error sending notification to:', token.token, 'Error:', e)
+                print('Retrieved FCM tokens for user:', ticket.user_id.id, 'Tokens:', [t.token for t in fcm_tokens])
 
         # context: no_log, because subtype already handle this
         tickets = super(HelpdeskTicket, self).create(list_value)
@@ -1116,7 +1174,27 @@ class HelpdeskTicket(models.Model):
             'context': {'default_ticket_id': self.id},
             'target': 'new'
         }
+class FcmToken(models.Model):
+    _name = 'fcm.token'
 
+    token = fields.Char(string='FCM Token', required=True)
+    user_id = fields.Many2one('res.users', string='User', required=True)
+
+    @api.model
+    def store_fcm_token(self, user_id, token):
+        # Check if a record with the same user ID and token already exists
+        existing_token = self.search([('user_id', '=', user_id), ('token', '=', token)], limit=1)
+        if not existing_token:
+            # If not, create a new record
+            self.create({'user_id': user_id, 'token': token})
+            print('Stored FCM token for user ', user_id, ': ', token)
+        else:
+            print('FCM token for user ', user_id, ' already exists: ', token)
+
+class ResUsers(models.Model):
+    _inherit = 'res.users'
+
+    fcm_token_id = fields.One2many('fcm.token', 'user_id', string='FCM Token')
 
 class HelpdeskTicketCategories(models.Model):
     _name = "helpdesk.ticket.categories"

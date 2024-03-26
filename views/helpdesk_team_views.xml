@@ -494,6 +494,7 @@
         </field>
     </record>
 
+    <!-- Overview Dashboard (Category Kanban) -->
     <record id="helpdesk_ticket_view_kanban_dashboard" model="ir.ui.view">
         <field name="name">helpdesk.ticket.kanban</field>
         <field name="model">helpdesk.ticket</field>
@@ -534,7 +535,7 @@
                             </div>
                             <div class="oe_kanban_content">
                                 <div>
-                                    <strong><field name="name"/> (#<field name="id"/>)</strong>
+                                    <strong>#<field name="ticket_number_display"/> <field name="sub_category_id"/></strong>
                                 </div>
                                 <div>
                                     <field name="commercial_partner_id"/>

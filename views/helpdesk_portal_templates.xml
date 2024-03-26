@@ -9,7 +9,7 @@
                 <t t-else="">Tickets</t>
             </li>
             <li t-if="ticket" class="breadcrumb-item active">
-                <span t-field="ticket.name"/> (#<span t-field="ticket.id"/>)
+                <span t-field="ticket.ticket_number_display"/> (<span t-field="ticket.category"/>)
             </li>
             <li t-if="rating_page" t-attf-class="breadcrumb-item active">
                 Our Ratings
@@ -54,7 +54,7 @@
                         <t t-foreach="tickets" t-as="ticket">
                             <tr>
                                 <td class="text-left"><a t-attf-href="/helpdesk/ticket/#{ticket.id}"><small>#</small><t t-esc="ticket.id"/></a></td>
-                                <td><a t-attf-href="/helpdesk/ticket/#{ticket.id}"><span t-field="ticket.name"/></a></td><td/>
+                                <td><a t-attf-href="/helpdesk/ticket/#{ticket.id}"><span t-field="ticket.ticket_number_display"/></a></td><td/>
                                 <td t-if="groupby != 'stage'" class="text-center"><span class="badge badge-pill badge-info" t-field="ticket.stage_id.name"/></td>
                             </tr>
                         </t>
@@ -80,7 +80,7 @@
                         <div class="col-md">
                             <h5 class="d-flex mb-1 mb-md-0">
                                 <div class="col-9 text-truncate">
-                                    <span t-field="ticket.name"/>
+                                    <span t-field="ticket.ticket_number_display"/>
                                     <small class="text-muted "> (#<span t-field="ticket.id"/>)</small>
                                 </div>
                                 <div class="col-3 text-right">
