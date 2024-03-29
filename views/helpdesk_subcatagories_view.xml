@@ -61,6 +61,9 @@
           <field eval="1" name="number_next"/>
           <field eval="1" name="number_increment"/>
       </record>
+        <menuitem id="helpdesk_subcategory_menu" name="Sub-Categories" action="helpdesk_ticket_subcategory_action"
+    sequence="1" parent="helpdesk.helpdesk_menu_config"
+    groups="helpdesk.group_helpdesk_manager"/>
 
     </data>
 </odoo>

@@ -38,6 +38,9 @@
 	      </p>
           </field>
       </record>
+        <menuitem id="helpdesk_problem_menu" name="Problems" action="helpdesk_ticket_problem_action"
+    sequence="2" parent="helpdesk.helpdesk_menu_config"
+    groups="helpdesk.group_helpdesk_manager"/>
 
 
     </data>

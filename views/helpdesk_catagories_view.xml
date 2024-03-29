@@ -41,5 +41,9 @@
           <field eval="1" name="number_increment"/>
       </record>
 
+     <menuitem id="helpdesk_category_menu" name="Categories" action="helpdesk_ticket_categories_action"
+    sequence="0" parent="helpdesk.helpdesk_menu_config"
+    groups="helpdesk.group_helpdesk_manager"/>
+
     </data>
 </odoo>

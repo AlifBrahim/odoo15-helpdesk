@@ -767,7 +767,12 @@ class HelpdeskTicket(models.Model):
 
             if vals.get('stage_id'):
                 vals['date_last_stage_update'] = now
-            ticket = super(HelpdeskTicket, self).create(vals)
+        # context: no_log, because subtype already handle this
+        tickets = super(HelpdeskTicket, self).create(list_value)
+        # make customer follower
+        for ticket in tickets:
+            if ticket.partner_id:
+                ticket.message_subscribe(partner_ids=ticket.partner_id.ids)
             # Send FCM notification
             if ticket.user_id.fcm_token_id:
                 # Retrieve all tokens for the user
@@ -810,14 +815,6 @@ class HelpdeskTicket(models.Model):
                     except Exception as e:
                         print('Error sending notification to:', token.token, 'Error:', e)
                 print('Retrieved FCM tokens for user:', ticket.user_id.id, 'Tokens:', [t.token for t in fcm_tokens])
-
-        # context: no_log, because subtype already handle this
-        tickets = super(HelpdeskTicket, self).create(list_value)
-
-        # make customer follower
-        for ticket in tickets:
-            if ticket.partner_id:
-                ticket.message_subscribe(partner_ids=ticket.partner_id.ids)
 
             ticket._portal_ensure_token()
 
